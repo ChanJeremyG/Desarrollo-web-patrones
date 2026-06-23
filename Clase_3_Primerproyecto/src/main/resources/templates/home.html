@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <title>Hola Spring</title>
+</head>
+
+<body style="background: #150D48; color: #fff; font-family: Arial; padding: 2rem;">
+    <!-- fragments/header.html -->
+    <div th:replace="fragments/header :: menu"></div>
+    <!-- <h1>Hola, <span th:text="${nombre}"></span>!</h1> 
+    <p>Mi primera aplicación Spring Boot está corriendo.</p> -->
+
+    <div class="container">
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="card-title" th:text="${nombre}">
+                </h2>
+                <p class="text-muted">
+                    Curso SC-403</p>
+                <a class="btn btn-primary" href="/cursos">Ver cursos</a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container my-4">
+        <div class="row">
+            <div class="col-md-4 p-3">
+                <div class="bg-primary text-white p-4 rounded">
+                    Columna A
+                </div>
+            </div>
+            <div class="col-md-4 p-3">
+                <div class="bg-secondary text-white p-4 rounded">
+                    Columna B
+                </div>
+            </div>
+            <div class="col-md-4 p-3">
+                <div class="bg-secondary text-white p-4 rounded">
+                    Columna C
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-4">
+        <h2 class="mb-3">Variantes de color</h2>
+
+        <button class="btn btn-primary">Primario</button>
+        <button class="btn btn-success">Exito</button>
+        <button class="btn btn-danger">Peligro</button>
+        <button class="btn btn-warning">Aviso</button>
+
+        <hr class="my-4">
+
+        <div class="alert alert-success">Todo salio bien!</div>
+        <div class="alert alert-danger">Algo fallo.</div>
+
+        <p>
+            <span class="badge bg-primary">Nuevo</span>
+            <span class="badge bg-success">Activo</span>
+        </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
