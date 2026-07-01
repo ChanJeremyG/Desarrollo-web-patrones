@@ -6,6 +6,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 /**
  * Entidad Producto - representa la tabla productos en MySQL.
@@ -25,18 +29,24 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre del producto es requerido")
+    @Size(max = 100)
     @Column(nullable = false, length = 100)
     private String nombre;
 
+    @Size(max = 500)
     @Column(length = 500)
     private String descripcion;
 
+    @Positive(message = "El precio debe ser mayor a cero")
     @Column(nullable = false)
     private double precio;
 
+    @PositiveOrZero(message = "El stock no puede ser un valor negativo")
     @Column(nullable = false)
     private int stock;
 
+    @Size(max = 50)
     @Column(length = 50)
     private String categoria;
 

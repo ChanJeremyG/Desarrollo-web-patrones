@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${producto.id == null} ? 'Nuevo producto' : 'Editar producto'">Producto</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<main class="container my-4">
+
+    <div class="card shadow-sm">
+        <div class="card-header brand-bg d-flex align-items-center gap-2">
+            <i class="bi bi-box-seam fs-4"></i>
+            <h2 class="mb-0 fs-4" th:text="${producto.id == null} ? 'Nuevo producto' : 'Editar producto'">Producto</h2>
+        </div>
+        <div class="card-body">
+
+            <form th:action="${producto.id == null} ? @{/productos} : @{/productos/{id}(id=${producto.id})}"
+                  th:object="${producto}"
+                  method="post" class="row g-3">
+
+                <th:block th:if="${#fields.hasErrors()}">
+                    <div class="alert alert-danger d-flex align-items-center gap-2 py-2">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span>Corregi los errores marcados en el formulario</span>
+                    </div>
+                </th:block>
+
+                <input type="hidden" th:field="*{id}">
+
+                <div class="col-12">
+                    <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control"
+                           th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid'"
+                           th:field="*{nombre}" placeholder="Nombre del producto">
+                    <div class="invalid-feedback" th:errors="*{nombre}"></div>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Descripcion</label>
+                    <textarea class="form-control" rows="3"
+                              th:classappend="${#fields.hasErrors('descripcion')} ? 'is-invalid'"
+                              th:field="*{descripcion}" placeholder="Descripcion del producto"></textarea>
+                    <div class="invalid-feedback" th:errors="*{descripcion}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Precio <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" step="0.01" min="0" class="form-control"
+                               th:classappend="${#fields.hasErrors('precio')} ? 'is-invalid'"
+                               th:field="*{precio}" placeholder="0.00">
+                        <div class="invalid-feedback" th:errors="*{precio}"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Stock <span class="text-danger">*</span></label>
+                    <input type="number" min="0" class="form-control"
+                           th:classappend="${#fields.hasErrors('stock')} ? 'is-invalid'"
+                           th:field="*{stock}" placeholder="0">
+                    <div class="invalid-feedback" th:errors="*{stock}"></div>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Categoria</label>
+                    <input type="text" class="form-control"
+                           th:classappend="${#fields.hasErrors('categoria')} ? 'is-invalid'"
+                           th:field="*{categoria}" placeholder="Ej: Electronica, Ropa, Hogar">
+                    <div class="invalid-feedback" th:errors="*{categoria}"></div>
+                </div>
+
+                <div class="col-12 d-flex justify-content-between border-top pt-3 mt-3">
+                    <a href="/productos" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Volver
+                    </a>
+                    <button class="btn btn-outline-success">
+                        <i class="bi bi-check-lg me-1"></i>Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
