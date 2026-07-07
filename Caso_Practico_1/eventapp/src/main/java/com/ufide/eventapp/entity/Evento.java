@@ -8,6 +8,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 /**
  * Entidad Evento - representa un evento publico (concierto, taller, charla...).
@@ -28,33 +34,43 @@ public class Evento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre del evento es requerido")
+    @Size(max = 120, message = "El nombre no puede tener mas de 120 caracteres")
     @Column(nullable = false, length = 120)
     private String nombre;
 
+    @Size(max = 500, message = "La descripcion no puede tener mas de 500 caracteres")
     @Column(length = 500)
     private String descripcion;
 
     /** Fecha del evento (sin hora). */
+    @NotNull(message = "La fecha es obligatoria")
+    @Future(message = "La fecha debe ser futura")
     @Column(nullable = false)
     private LocalDate fecha;
 
+    @Size(max = 100, message = "El lugar no puede tener mas de 100 caracteres")
     @Column(length = 100)
     private String lugar;
 
     /** Categoria libre: "Musica", "Conferencia", "Deporte", "Taller", etc. */
+    @Size(max = 50, message = "La categoria no puede tener mas de 50 caracteres")
     @Column(length = 50)
     private String categoria;
 
+    @Size(max = 80, message = "El organizador no puede tener mas de 80 caracteres")
     @Column(length = 80)
     private String organizador;
 
     /** Cupo total disponible. */
+    @Positive(message = "El cupo maximo debe ser mayor a cero")
     private int cupoMaximo;
 
     /** Tickets ya vendidos. */
     private int cuposVendidos;
 
     /** Precio de la entrada (0 si es gratis). */
+    @PositiveOrZero(message = "El precio no puede ser negativo")
     private double precio;
 
     public Evento() {}
@@ -71,6 +87,14 @@ public class Evento {
         this.cupoMaximo = cupoMaximo;
         this.cuposVendidos = cuposVendidos;
         this.precio = precio;
+    }
+
+    public boolean isLleno() {
+        return cuposVendidos >= cupoMaximo;
+    }
+
+    public boolean isProximo() {
+        return fecha != null && !fecha.isBefore(LocalDate.now());
     }
 
     // Getters y setters

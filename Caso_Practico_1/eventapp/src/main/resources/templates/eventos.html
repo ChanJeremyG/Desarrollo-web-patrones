@@ -21,16 +21,17 @@
                 Total: <span class="badge bg-primary" th:text="${eventos.size()}">0</span>
             </p>
         </div>
-        <!--
-          TODO Caso Practico:
-          Aca tenes que agregar el boton "Nuevo evento" que lleve al form de creacion.
-        -->
+        <a th:href="@{/eventos/nuevo}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Nuevo evento
+        </a>
     </div>
 
-    <!--
-      TODO Caso Practico:
-      Aca conviene mostrar los flash messages (ok / error) que vienen del controller.
-    -->
+    <div class="alert alert-success alert-dismissible fade show" th:if="${ok}" th:text="${ok}">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div class="alert alert-danger alert-dismissible fade show" th:if="${error}" th:text="${error}">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 
     <div class="row g-3">
         <div class="col-12 col-md-6 col-lg-4" th:each="e : ${eventos}">
@@ -52,17 +53,29 @@
                             <span class="fw-bold" th:text="${e.cuposVendidos} + ' / ' + ${e.cupoMaximo}">0/0</span>
                             cupos
                         </small>
-                        <a class="btn btn-outline-primary btn-sm"
-                           th:href="@{/eventos/{id}(id=${e.id})}">
-                            Ver detalle
-                            <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
+                        <span th:if="${e.lleno}" class="badge bg-danger">Lleno</span>
+                        <span th:if="${!e.lleno}" class="badge bg-success">Disponible</span>
                     </div>
-                    <!--
-                      TODO Caso Practico:
-                      Aca podes agregar los botones "Editar" y "Eliminar" para cada evento.
-                      Recordar que "Eliminar" debe disparar un modal de confirmacion.
-                    -->
+                    <div class="d-flex justify-content-between mt-3">
+                        <div>
+                            <a class="btn btn-outline-primary btn-sm"
+                               th:href="@{/eventos/{id}(id=${e.id})}">
+                                <i class="bi bi-eye"></i> Ver
+                            </a>
+                            <a class="btn btn-outline-secondary btn-sm"
+                               th:href="@{/eventos/{id}/editar(id=${e.id})}">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        </div>
+                        <button type="button"
+                                class="btn btn-outline-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalEliminar"
+                                th:data-id="${e.id}"
+                                th:data-nombre="${e.nombre}">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -78,12 +91,39 @@
 <footer th:replace="~{fragments/header :: footer}"></footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!--
-  TODO Caso Practico:
-  Cuando agregues el boton "Eliminar", aca al final del body
-  va el modal de confirmacion + el script que toma el data-id
-  de cada boton y lo inserta en la action del form de borrado.
--->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminacion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <span>Seguro que deseas eliminar</span>
+                <strong id="nombreModal"></strong>?
+                <p class="text-danger mb-0"><small>Esta accion no se puede deshacer.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="post" th:action="@{''}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('modalEliminar').addEventListener('show.bs.modal', function(event) {
+        var btn = event.relatedTarget;
+        var id = btn.getAttribute('data-id');
+        var nombre = btn.getAttribute('data-nombre');
+        document.getElementById('formEliminar').action = '/eventos/' + id + '/eliminar';
+        document.getElementById('nombreModal').textContent = nombre;
+    });
+</script>
 
 </body>
 </html>
