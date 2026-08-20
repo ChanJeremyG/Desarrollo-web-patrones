@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Acceso denegado')}"></head>
+<body>
+<div th:replace="~{fragments/header :: nav}"></div>
+<div class="container text-center" style="max-width: 520px; margin-top: 80px;">
+    <div class="card">
+        <div class="card-body p-5">
+            <h1 class="text-danger mb-3">403 - Acceso denegado</h1>
+            <p class="text-muted">
+                Tu usuario esta logueado, pero no tiene el rol necesario para
+                realizar esta accion (por ejemplo, registrar prestamos o
+                administrar libros requiere el rol <strong>BIBLIOTECARIO</strong>).
+            </p>
+            <a th:href="@{/libros}" class="btn btn-primary">Volver al catalogo</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

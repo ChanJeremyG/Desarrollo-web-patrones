@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Detalle del libro')}"></head>
+<body>
+<div th:replace="~{fragments/header :: nav}"></div>
+<div class="container">
+    <div th:if="${libro == null}" class="alert alert-danger">Libro no encontrado.</div>
+    <div th:if="${libro != null}" class="card">
+        <div class="card-body">
+            <h2 th:text="${libro.titulo}">Titulo</h2>
+            <h5 class="text-muted" th:text="${libro.autor}">Autor</h5>
+            <p><strong>ISBN:</strong> <span th:text="${libro.isbn}"></span></p>
+            <p><strong>Categoria:</strong> <span th:text="${libro.categoria}"></span></p>
+            <p><strong>Disponibilidad:</strong>
+                <span th:text="${libro.copiasDisponibles} + ' de ' + ${libro.copiasTotales}"></span>
+                <span class="badge bg-warning text-dark" th:if="${libro.copiasDisponibles == 0}">Sin copias disponibles</span>
+            </p>
+
+            <!-- REQUISITO 2: boton para prestar, visible solo para BIBLIOTECARIO -->
+            <a th:href="@{/prestamos/nuevo(libroId=${libro.id})}" class="btn btn-success"
+               sec:authorize="hasRole('BIBLIOTECARIO')">Prestar este libro</a>
+
+            <a href="/libros" class="btn btn-secondary">Volver al catalogo</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

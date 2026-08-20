@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Catalogo')}"></head>
+<body>
+<div th:replace="~{fragments/header :: nav}"></div>
+<div class="container">
+    <h1 class="mb-4">Catalogo de libros</h1>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col" th:each="libro : ${libros}">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${libro.titulo}">Titulo</h5>
+                    <h6 class="card-subtitle mb-2 text-muted" th:text="${libro.autor}">Autor</h6>
+                    <p class="card-text">
+                        <span class="badge bg-secondary" th:text="${libro.categoria}">Categoria</span>
+                        <span class="badge bg-info text-dark"
+                              th:text="${libro.copiasDisponibles} + ' / ' + ${libro.copiasTotales} + ' disponibles'">
+                            disponibles
+                        </span>
+                        <!-- Bonus chico (+2): badge "Sin copias disponibles" -->
+                        <span class="badge bg-warning text-dark" th:if="${libro.copiasDisponibles == 0}">Sin copias disponibles</span>
+                    </p>
+                    <a th:href="@{'/libros/' + ${libro.id}}" class="btn btn-outline-primary btn-sm">Ver detalle</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
