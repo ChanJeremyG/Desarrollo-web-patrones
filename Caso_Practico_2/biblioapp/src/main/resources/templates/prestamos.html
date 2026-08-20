@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Prestamos')}"></head>
+<body>
+<div th:replace="~{fragments/header :: nav}"></div>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Prestamos</h1>
+        <a class="btn btn-primary" th:href="@{/prestamos/nuevo}" sec:authorize="hasRole('BIBLIOTECARIO')">Nuevo prestamo</a>
+    </div>
+
+    <div th:if="${ok}" class="alert alert-success" th:text="${ok}">Operacion realizada</div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}">Hubo un error</div>
+
+    <!-- REQUISITO 5: prestamos atrasados resaltados en rojo, solo bibliotecario -->
+    <div class="card border-danger mb-4" sec:authorize="hasRole('BIBLIOTECARIO')">
+        <div class="card-header bg-danger text-white">Prestamos atrasados</div>
+        <div class="card-body" th:if="${atrasados == null or atrasados.isEmpty()}">
+            <p class="text-muted mb-0">No hay prestamos atrasados.</p>
+        </div>
+        <table class="table table-bordered mb-0" th:if="${atrasados != null and !atrasados.isEmpty()}">
+            <thead class="table-light">
+                <tr>
+                    <th>Libro</th>
+                    <th>Usuario</th>
+                    <th>Fecha limite</th>
+                    <th>Dias de atraso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="table-danger" th:each="a : ${atrasados}">
+                    <td th:text="${a.libro.titulo}">Libro</td>
+                    <td th:text="${a.usuario.username}">Usuario</td>
+                    <td th:text="${a.fechaLimite}">Fecha limite</td>
+                    <td th:text="${T(java.time.LocalDate).now().toEpochDay() - a.fechaLimite.toEpochDay()}">0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Libro</th>
+                <th>Usuario</th>
+                <th>Fecha prestamo</th>
+                <th>Fecha limite</th>
+                <th>Fecha devolucion</th>
+                <th>Estado</th>
+                <th sec:authorize="hasRole('BIBLIOTECARIO')">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="p : ${prestamos}">
+                <!-- REQUISITO 2: se muestra el titulo del libro asociado,
+                     no solo un id (prestamo.getLibro().getTitulo()) -->
+                <td th:text="${p.libro.titulo}">Libro</td>
+                <td th:text="${p.usuario.username}">Usuario</td>
+                <td th:text="${p.fechaPrestamo}">Fecha prestamo</td>
+                <td th:text="${p.fechaLimite}">Fecha limite</td>
+                <td th:text="${p.fechaDevolucion}">-</td>
+                <td>
+                    <span th:if="${p.fechaDevolucion == null}" class="badge bg-warning text-dark">Prestado</span>
+                    <span th:unless="${p.fechaDevolucion == null}" class="badge bg-success">Devuelto</span>
+                </td>
+                <td sec:authorize="hasRole('BIBLIOTECARIO')">
+                    <form th:if="${p.fechaDevolucion == null}" method="post"
+                          th:action="@{/prestamos/{id}/devolver(id=${p.id})}">
+                        <button type="submit" class="btn btn-sm btn-outline-success">Registrar devolucion</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="alert alert-info" th:if="${prestamos.isEmpty()}">No hay prestamos que mostrar.</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Nuevo prestamo')}"></head>
+<body>
+<div th:replace="~{fragments/header :: nav}"></div>
+<div class="container" style="max-width: 640px;">
+    <h1 class="mb-4">Registrar prestamo</h1>
+
+    <form th:action="@{/prestamos}" th:object="${prestamo}" method="post">
+        <div class="mb-3">
+            <label class="form-label">Libro</label>
+            <select class="form-select" th:field="*{libro.id}" required>
+                <option value="">Seleccione un libro</option>
+                <option th:each="l : ${libros}" th:value="${l.id}"
+                        th:text="${l.titulo} + ' (' + ${l.copiasDisponibles} + ' disponibles)'"></option>
+            </select>
+            <div class="text-danger" th:errors="*{libro}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Usuario (lector)</label>
+            <select class="form-select" th:field="*{usuario.id}" required>
+                <option value="">Seleccione un lector</option>
+                <option th:each="u : ${usuarios}" th:value="${u.id}"
+                        th:text="${u.nombreCompleto} + ' (' + ${u.username} + ')'"></option>
+            </select>
+            <div class="text-danger" th:errors="*{usuario}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Fecha de prestamo</label>
+            <input type="date" class="form-control" th:field="*{fechaPrestamo}" required>
+            <div class="form-text">La fecha limite se calcula automaticamente: 14 dias despues de la fecha de prestamo.</div>
+            <div class="text-danger" th:errors="*{fechaPrestamo}"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Registrar prestamo</button>
+        <a th:href="@{/prestamos}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+</body>
+</html>
