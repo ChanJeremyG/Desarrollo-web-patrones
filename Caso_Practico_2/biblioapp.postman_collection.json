@@ -1,0 +1,230 @@
+{
+  "info": {
+    "name": "BiblioApp API",
+    "_postman_id": "biblioapp-sc403-collection",
+    "description": "Coleccion del Caso Practico 2 (SC-403). Autenticacion por sesion (cookie JSESSIONID) + CSRF. Flujo sugerido: 1) Login bibliotecaria1, 2) pruebas de la API de libros, 3) GET atrasados, 4) Login lector1, 5) POST /api/libros -> 403.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Autenticacion (sesion)",
+      "item": [
+        {
+          "name": "Login bibliotecaria1",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "username", "value": "bibliotecaria1", "type": "text" },
+                { "key": "password", "value": "password123", "type": "text" },
+                { "key": "_csrf", "value": "{{csrf}}", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "description": "Loguea como BIBLIOTECARIO. El script previo obtiene el token CSRF desde el meta tag de la pagina de login y guarda la cookie de sesion."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.sendRequest(pm.variables.get('base_url') + '/login', function (err, res) {",
+                  "    if (err) { console.log(err); return; }",
+                  "    var m = res.text().match(/name=\"_csrf\" content=\"([^\"]+)\"/);",
+                  "    if (m) { pm.variables.set('csrf', m[1]); }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Login lector1",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "username", "value": "lector1", "type": "text" },
+                { "key": "password", "value": "password123", "type": "text" },
+                { "key": "_csrf", "value": "{{csrf}}", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "description": "Loguea como LECTOR. Remplaza la cookie de sesion anterior."
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.sendRequest(pm.variables.get('base_url') + '/login', function (err, res) {",
+                  "    if (err) { console.log(err); return; }",
+                  "    var m = res.text().match(/name=\"_csrf\" content=\"([^\"]+)\"/);",
+                  "    if (m) { pm.variables.set('csrf', m[1]); }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Libros",
+      "item": [
+        {
+          "name": "GET /api/libros (publico)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/libros",
+              "host": ["{{base_url}}"],
+              "path": ["api", "libros"]
+            },
+            "description": "Catalogo completo en JSON. Publico: no requiere login."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/libros/1 (200)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/libros/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "libros", "1"]
+            },
+            "description": "200 OK con el libro de id=1."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/libros/999 (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/libros/999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "libros", "999"]
+            },
+            "description": "Libro inexistente -> 404 sin body (ResponseEntity.notFound())."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/libros (201 bibliotecario)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"El alquimista\",\n  \"autor\": \"Paulo Coelho\",\n  \"isbn\": \"978-0062502174\",\n  \"categoria\": \"Ficcion\",\n  \"copiasTotales\": 3,\n  \"copiasDisponibles\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/libros",
+              "host": ["{{base_url}}"],
+              "path": ["api", "libros"]
+            },
+            "description": "Requiere sesion de BIBLIOTECARIO. @Valid valida el body. 201 Created + header Location. Ejecutar tras 'Login bibliotecaria1'."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/libros (400 validacion)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"\",\n  \"autor\": \"\",\n  \"isbn\": \"\",\n  \"categoria\": \"\",\n  \"copiasTotales\": 0,\n  \"copiasDisponibles\": -1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/libros",
+              "host": ["{{base_url}}"],
+              "path": ["api", "libros"]
+            },
+            "description": "Body invalido -> 400 Bad Request por las validaciones @NotBlank/@Positive."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/libros (403 lector)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"X\",\n  \"autor\": \"Y\",\n  \"isbn\": \"978-0000000000\",\n  \"categoria\": \"Z\",\n  \"copiasTotales\": 1,\n  \"copiasDisponibles\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/libros",
+              "host": ["{{base_url}}"],
+              "path": ["api", "libros"]
+            },
+            "description": "Ejecutar tras 'Login lector1' (reemplaza la sesion). El lector NO tiene rol BIBLIOTECARIO -> @PreAuthorize bloquea y devuelve 403."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Prestamos",
+      "item": [
+        {
+          "name": "GET /api/prestamos/atrasados (200 bibliotecario)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/api/prestamos/atrasados",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prestamos", "atrasados"]
+            },
+            "description": "Usa la consulta JPQL prestamosAtrasados() de PrestamoRepository (fechaDevolucion IS NULL y fechaLimite < CURRENT_DATE). Requiere BIBLIOTECARIO."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/prestamos/atrasados (403 lector)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/prestamos/atrasados",
+              "host": ["{{base_url}}"],
+              "path": ["api", "prestamos", "atrasados"]
+            },
+            "description": "Con sesion de lector -> 403 (listar atrasados es funcion del bibliotecario)."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
